@@ -1,4 +1,4 @@
-@HealthCheck.Server_HostAddress = http://localhost:5054
+@HealthCheck.Server_HostAddress = http://localhost:40080
 
 GET {{HealthCheck.Server_HostAddress}}/weatherforecast/
 Accept: application/json
