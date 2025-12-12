@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
+// Interface to store the weather forecast data 
 interface WeatherForecast {
   date: string;
   temperatureC: number;
