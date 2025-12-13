@@ -24,14 +24,15 @@ export class AppComponent implements OnInit {
   }
 
   getForecasts() {
-    this.http.get<WeatherForecast[]>('/api/weatherforecast').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+    this.http.get<WeatherForecast[]>('/api/weatherforecast')
+      .subscribe({
+        next: (result) => {
+          this.forecasts = result;
+        },
+        error: (error) => {
+          console.error(error);
+        }
+      });
   }
 
   title = 'healthcheck.client';
