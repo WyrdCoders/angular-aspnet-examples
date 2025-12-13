@@ -14,6 +14,16 @@ Run `ng generate environments` to create the `environment.ts` and `environment.d
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
+#### The dry run switch
+
+Add the `--dry-run` switch to prevent the CLI from making any changes to the file system. Useful for seeing what a command does without creating or modifying files. Example: `ng generate component component-name --dry-run`
+
+###### Note: The `--dry-run` switch can be used with any Angular CLI command and is not limited to `ng generate component`.
+
+#### Skipping the spec.ts file
+
+Add the `--skip-tests` switch to prevent the creation of the `spec.ts` file. Example: `ng generate component component-name --skip-tests`
+
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
