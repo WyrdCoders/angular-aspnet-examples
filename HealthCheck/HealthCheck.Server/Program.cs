@@ -5,7 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 /* Add services to the container */
 
-builder.Services.AddHealthChecks().AddCheck<PingHealthCheck>("Ping");
+builder.Services.AddHealthChecks()
+    .AddCheck("Ping_01", new PingHealthCheck("github.com", 100))
+    .AddCheck("Ping_02", new PingHealthCheck("google.com", 100))
+    .AddCheck("Ping_03", new PingHealthCheck($"{Guid.NewGuid():N}.com", 100));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -35,7 +38,7 @@ app.UseAuthorization();
 /* Adding before MapControllers ensures the HealthChecks route won't be overridden
  * by any controller that might share that same route in the future.
  * Learn more about Health Checkes at https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks */
-app.UseHealthChecks(new PathString("/api/health"));
+app.UseHealthChecks(new PathString("/api/health"), new CustomHealthCheckOptions());
 
 // Add the endpoints required by the controller action methods to handle incoming HTTP requests with default routing rules
 app.MapControllers();

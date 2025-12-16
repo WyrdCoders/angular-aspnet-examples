@@ -6,11 +6,10 @@ namespace HealthCheck.Server;
 /// <summary>
 /// Implements an Internet Control Message Protocol (ICMP) health check.
 /// </summary>
-public class PingHealthCheck : IHealthCheck
+public class PingHealthCheck(string host, int healthyRoundtripTime) : IHealthCheck
 {
-    // Set host to a non-routable IP address to simulate an "unhealthy" scenario
-    private readonly string _host = "10.0.0.0";
-    private readonly int _healthyRoundTripTime = 300;
+    private readonly string _host = host;
+    private readonly int _healthyRoundtripTime = healthyRoundtripTime;
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
@@ -18,16 +17,20 @@ public class PingHealthCheck : IHealthCheck
 		{
 			using var ping = new Ping();
 			var reply = await ping.SendPingAsync(_host);
-            return reply.Status switch
+
+            switch (reply.Status)
             {
-                IPStatus.Success => (reply.RoundtripTime > _healthyRoundTripTime) 
-                    ? HealthCheckResult.Degraded() : HealthCheckResult.Healthy(),
-                _ => HealthCheckResult.Unhealthy(),
-            };
+                case IPStatus.Success:
+                    string message = $"Ping to {_host} took {reply.RoundtripTime} ms.";
+                    return (reply.RoundtripTime > _healthyRoundtripTime)
+                        ? HealthCheckResult.Degraded(message) : HealthCheckResult.Healthy(message);
+                default:
+                    return HealthCheckResult.Unhealthy($"Ping to {_host} failed: {reply.Status}");
+            }
         }
-		catch (Exception)
+		catch (Exception ex)
 		{
-			return HealthCheckResult.Unhealthy();
+			return HealthCheckResult.Unhealthy($"Ping to {_host} failed: {ex.Message}");
 		}
     }
 }
