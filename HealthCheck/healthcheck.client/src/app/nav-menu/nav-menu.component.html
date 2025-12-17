@@ -1,13 +1,19 @@
 <header>
-  <nav>
-    <!--
-      Each hyperlink element contains a reference to a RouterLink,
-      an Angular directive that makes that element a link that initiates the navigation to a route.
-    -->
-    <a [routerLink]="['/']">Home</a>
-    |
-    <a [routerLink]="['/fetch-data']">Fetch Data</a>
-    |
-    <a [routerLink]="['/health-check']">Health Check</a>
-  </nav>
+  <!--
+    Each hyperlink element contains a reference to a RouterLink,
+    an Angular directive that makes that element a link that initiates the navigation to a route.
+  -->
+  <mat-toolbar color="primary">
+    <button mat-icon-button [routerLink]="['/']">
+      <mat-icon>
+        home
+      </mat-icon>
+    </button>
+    <a mat-flat-button color="primary" [routerLink]="['/fetch-data']">
+      Fetch Data
+    </a>
+    <a mat-flat-button color="primary" [routerLink]="['/health-check']">
+      Health Check
+    </a>
+  </mat-toolbar>
 </header>
