@@ -1,0 +1,19 @@
+table {
+    margin: 0 auto;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.healthy {
+    color: green;
+}
+
+.degraded {
+    color: orange;
+}
+
+.unhealthy {
+    color: red;
+}
