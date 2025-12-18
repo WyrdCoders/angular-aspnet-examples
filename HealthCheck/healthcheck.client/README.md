@@ -40,6 +40,10 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 
 Run `ng add @angular/material` or include the version number like `ng add @angular/material@17.0.3`.
 
+## Replacing CSS with Sass
+
+Run `ng add schematics-scss-migrate` to automatically migrate from CSS to SCSS.
+
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
