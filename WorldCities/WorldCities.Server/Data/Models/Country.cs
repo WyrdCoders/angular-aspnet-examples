@@ -25,4 +25,9 @@ public class Country
     /// Country code (in ISO 3166-1 ALPHA-3 format)
     /// </summary>
     public required string ISO3 { get; set; }
+
+    /// <summary>
+    /// A collection of all the cities related to this country.
+    /// </summary>
+    public ICollection<City>? Cities { get; set; }
 }
