@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorldCities.Server.Data.Models;
 
+[Table("Countries")]
 public class Country
 {
     /// <summary>
