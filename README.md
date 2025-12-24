@@ -3,7 +3,7 @@ Examples of using Angular and ASP.NET together.
 
 ## Example Projects
 - [HealthCheck](https://github.com/WyrdCoders/angular-aspnet-examples/tree/main/HealthCheck) (Angular 17 / .NET 8)
-- [WorldCities](https://github.com/WyrdCoders/angular-aspnet-examples/tree/main/WorldCities) (Angular 17 / .NET 8)
+- [WorldCities](https://github.com/WyrdCoders/angular-aspnet-examples/tree/main/WorldCities) (Angular 17 / .NET 8 / Entity Framework Core / SQL Server)
 
 ## Angular References
 - [Official Page](https://angular.dev/ "angular.dev")
