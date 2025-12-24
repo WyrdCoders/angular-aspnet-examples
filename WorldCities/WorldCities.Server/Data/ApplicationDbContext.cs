@@ -16,7 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<City> Cities => Set<City>();
     public DbSet<Country> Countries => Set<Country>();
 
-    /* Fluent API Example
+    /* Fluent API with EntityTypeConfiguration classes Example
      * Fluent API configurations override any existing EF Core convention or data annotations
      * applied to entity classes and properties.
      */
@@ -24,15 +24,7 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<City>().ToTable("Cities");
-        modelBuilder.Entity<City>().HasKey(x => x.Id);
-        modelBuilder.Entity<City>().Property(x => x.Id).IsRequired();
-        modelBuilder.Entity<City>().Property(x => x.Lat).HasColumnType("decimal(7,4)");
-        modelBuilder.Entity<City>().Property(x => x.Lon).HasColumnType("decimal(7,4)");
-
-        modelBuilder.Entity<Country>().ToTable("Countries");
-        modelBuilder.Entity<Country>().HasKey(x => x.Id);
-        modelBuilder.Entity<Country>().Property(x => x.Id).IsRequired();
-        modelBuilder.Entity<City>().HasOne(x => x.Country).WithMany(y => y.Cities).HasForeignKey(x => x.CountryId);
+        // Add the EntityTypeConfiguration classes
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }
