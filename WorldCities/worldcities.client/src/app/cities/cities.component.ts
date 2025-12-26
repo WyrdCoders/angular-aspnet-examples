@@ -15,7 +15,6 @@ export class CitiesComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    console.log(environment.production);
     this.http.get<City[]>(environment.baseUrl + 'api/cities')
       .subscribe({
         next: (result) => this.cities = result,
