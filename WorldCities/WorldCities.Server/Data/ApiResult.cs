@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
+using System.Reflection;
 
 namespace WorldCities.Server.Data;
 
@@ -18,6 +20,16 @@ public class ApiResult<T>
     /// Number of data items contained in each page.
     /// </summary>
     public int PageSize { get; private set; }
+
+    /// <summary>
+    /// Sorting column name (or null if none set).
+    /// </summary>
+    public string? SortColumn { get; private set; }
+
+    /// <summary>
+    /// Sorting order ("ASC", "DESC" or null if none set).
+    /// </summary>
+    public string? SortOrder { get; private set; }
 
     /// <summary>
     /// Total number of data items.
@@ -46,28 +58,57 @@ public class ApiResult<T>
     /// <param name="count">Total number of data items</param>
     /// <param name="pageIndex">Zero-based index of current page</param>
     /// <param name="pageSize">Number of data items contained in each page</param>
-    private ApiResult(List<T> data, int count, int pageIndex, int pageSize)
+    /// <param name="sortColumn">The sorting column name</param>
+    /// <param name="sortOrder">The sorting order ("ASC" or "DESC")</param>
+    private ApiResult(List<T> data, int count, int pageIndex, int pageSize, string? sortColumn, string? sortOrder)
     {
         Data = data;
         PageIndex = pageIndex;
         PageSize = pageSize;
+        SortColumn = sortColumn;
+        SortOrder = sortOrder;
         TotalCount = count;
         TotalPages = (int)Math.Ceiling(count  / (double)PageSize);
     }
 
     /// <summary>
-    /// Pages an IQueryable source.
+    /// Pages and/or sorts an IQueryable source.
     /// </summary>
     /// <param name="source">An IQueryable source of generic type</param>
     /// <param name="pageIndex">Zero-based current page index (0 = first page)</param>
     /// <param name="pageSize">The actual size of each page</param>
-    /// <returns>An object containing the paged result and all the relevant paging navigation info.</returns>
-    public static async Task<ApiResult<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
+    /// <param name="sortColumn">The sorting column name</param>
+    /// <param name="sortOrder">The sorting order ("ASC" or "DESC")</param>
+    /// <returns>An object containing the paged/sorted result and all the relevant paging/sorting navigation info.</returns>
+    public static async Task<ApiResult<T>> CreateAsync(
+        IQueryable<T> source, int pageIndex, int pageSize, string? sortColumn, string? sortOrder)
     {
         int count = await source.CountAsync();
+
+        if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn)) 
+        {
+            sortOrder = !string.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC" ? "ASC" : "DESC";
+            source = source.OrderBy($"{sortColumn} {sortOrder}");
+        }
+        
         source = source.Skip(pageIndex * pageSize).Take(pageSize);
         var data = await source.ToListAsync();
 
-        return new ApiResult<T>(data, count, pageIndex, pageSize);
+        return new ApiResult<T>(data, count, pageIndex, pageSize, sortColumn, sortOrder);
+    }
+
+    /// <summary>
+    /// Checks if the given property name exists to protect against SQL injection attacks.
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="throwExceptionIfNotFound"></param>
+    /// <returns></returns>
+    public static bool IsValidProperty(string propertyName, bool throwExceptionIfNotFound = true) 
+    {
+        var prop = typeof(T).GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        if (prop is null && throwExceptionIfNotFound)
+            throw new NotSupportedException($"ERROR: Property '{propertyName}' does not exist.");
+
+        return prop != null;
     }
 }
