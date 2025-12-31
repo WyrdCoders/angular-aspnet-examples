@@ -12,6 +12,16 @@ public class ApiResult<T>
     public List<T> Data { get; private set; }
 
     /// <summary>
+    /// Filter column name (or null if none set).
+    /// </summary>
+    public string? FilterColumn { get; private set; }
+
+    /// <summary>
+    /// Filter query to be used within the given FilterColumn.
+    /// </summary>
+    public string? FilterQuery { get; private set; }
+
+    /// <summary>
     /// Zero-based index of current page.
     /// </summary>
     public int PageIndex { get; private set; }
@@ -60,9 +70,13 @@ public class ApiResult<T>
     /// <param name="pageSize">Number of data items contained in each page</param>
     /// <param name="sortColumn">The sorting column name</param>
     /// <param name="sortOrder">The sorting order ("ASC" or "DESC")</param>
-    private ApiResult(List<T> data, int count, int pageIndex, int pageSize, string? sortColumn, string? sortOrder)
+    private ApiResult(
+        List<T> data, int count, int pageIndex, int pageSize, string? sortColumn, string? sortOrder, 
+        string? filterColumn, string? filterQuery)
     {
         Data = data;
+        FilterColumn = filterColumn;
+        FilterQuery = filterQuery;
         PageIndex = pageIndex;
         PageSize = pageSize;
         SortColumn = sortColumn;
@@ -72,17 +86,29 @@ public class ApiResult<T>
     }
 
     /// <summary>
-    /// Pages and/or sorts an IQueryable source.
+    /// Pages, sorts and/or filters an IQueryable source.
     /// </summary>
     /// <param name="source">An IQueryable source of generic type</param>
     /// <param name="pageIndex">Zero-based current page index (0 = first page)</param>
     /// <param name="pageSize">The actual size of each page</param>
     /// <param name="sortColumn">The sorting column name</param>
     /// <param name="sortOrder">The sorting order ("ASC" or "DESC")</param>
-    /// <returns>An object containing the paged/sorted result and all the relevant paging/sorting navigation info.</returns>
+    /// <param name="filterColumn">The filtering column name</param>
+    /// <param name="filterQuery">The filtering query (value to lookup)</param>
+    /// <returns>
+    /// An object containing the paged/sorted result and all the relevant 
+    /// paging/sorting/filtering navigation info.
+    /// </returns>
     public static async Task<ApiResult<T>> CreateAsync(
-        IQueryable<T> source, int pageIndex, int pageSize, string? sortColumn, string? sortOrder)
+        IQueryable<T> source, int pageIndex, int pageSize, 
+        string? sortColumn = null, string? sortOrder = null, 
+        string? filterColumn = null, string? filterQuery = null)
     {
+        if (!string.IsNullOrEmpty(filterColumn) && !string.IsNullOrEmpty(filterQuery) && IsValidProperty(filterColumn)) 
+        {
+            source = source.Where($"{filterColumn}.StartsWith(@0)", filterQuery);
+        }
+
         int count = await source.CountAsync();
 
         if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn)) 
@@ -94,7 +120,7 @@ public class ApiResult<T>
         source = source.Skip(pageIndex * pageSize).Take(pageSize);
         var data = await source.ToListAsync();
 
-        return new ApiResult<T>(data, count, pageIndex, pageSize, sortColumn, sortOrder);
+        return new ApiResult<T>(data, count, pageIndex, pageSize, sortColumn, sortOrder, filterColumn, filterQuery);
     }
 
     /// <summary>
