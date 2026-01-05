@@ -2,6 +2,10 @@
 
 <p *ngIf="!cities"><em>Loading...</em></p>
 
+<button mat-flat-button color="primary" class="btn-add" *ngIf="cities" [routerLink]="['/city']">
+  Add a new City
+</button>
+
 <mat-form-field [style.display]="cities ? 'block' : 'none'">
   <input matInput #filter (keyup)="loadData(filter.value)" placeholder="Filter by name (or part of it)..." />
 </mat-form-field>
